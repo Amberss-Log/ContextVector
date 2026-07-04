@@ -53,5 +53,34 @@ class ContextVector:
             
         return float(dot_product / (norm_self * norm_other))
 
+    # ------------------------------------
+    # NATIVE SERIALIZATION CORE UTILITIES
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Serialization: Converts the active memory object into a standard, 
+        JSON-compliant Python dictionary. Unpacks NumPy binary arrays.
+        """
+        return {
+            "embedding": self._embedding.tolist(),  # Critical conversion to plain list
+            "payload": self.payload,
+            "modality": self.modality,
+            "metadata": self.metadata
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
+        """
+        Deserialization Factory: Reconstitutes a live, functional ContextVector 
+        instance from a standard dictionary payload (e.g. from a database).
+        """
+        # Extract the fields safely with default fallback parameters
+        return cls(
+            embedding=data["embedding"],
+            payload=data["payload"],
+            modality=data.get("modality", "text"),
+            metadata=data.get("metadata", {})
+        )
+
     def __repr__(self) -> str:
         return f"<ContextVector | Modality: {self.modality.upper()} | Dimensions: {self.dimensions}>"
