@@ -53,7 +53,6 @@ class ContextVector:
             
         return float(dot_product / (norm_self * norm_other))
 
-    # ------------------------------------
     # NATIVE SERIALIZATION CORE UTILITIES
 
     def to_dict(self) -> Dict[str, Any]:
@@ -82,5 +81,21 @@ class ContextVector:
             metadata=data.get("metadata", {})
         )
 
+    # NATIVE COMPARISON UTILITIES
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Performs structural equality checks between two instances.
+        Verifies modality, payload, and exact vector weight alignment.
+        """
+        if not isinstance(other, ContextVector):
+            return False
+            
+        return (
+            self.modality == other.modality and
+            self.payload == other.payload and
+            np.array_equal(self._embedding, other._embedding)
+        )
+        
     def __repr__(self) -> str:
         return f"<ContextVector | Modality: {self.modality.upper()} | Dimensions: {self.dimensions}>"

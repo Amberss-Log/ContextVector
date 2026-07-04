@@ -3,34 +3,30 @@ from core import ContextVector
 from providers.ollama import OllamaProvider
 
 if __name__ == "__main__":
-    print(" Running Serialization Playground...")
+    print("Running Structural Equality & Serialization Test...")
     provider = OllamaProvider()
     target_model = "nomic-embed-text"
     
-    # 1. Create a live vector object via our automated factory
-    original_cv = ContextVector.from_text(
-        text="Data serialization enables network transmission pipeline stability.",
+    # 1. Generate the base vector instance
+    cv_original = ContextVector.from_text(
+        text="Structural equality validation ensures object parity.",
         provider=provider,
         model_name=target_model,
-        metadata={"user_id": "tanis", "environment": "production"}
+        metadata={"version": 1.0}
     )
     
-    print(f"\n Step 1: Created Original Live Instance: {original_cv}")
+    # 2. Convert to dictionary and back to simulate a storage cycle
+    payload_map = cv_original.to_dict()
+    cv_reconstituted = ContextVector.from_dict(payload_map)
     
-    # 2. Serialize to Dictionary/JSON payload string (Simulating saving to disk)
-    serialized_dict = original_cv.to_dict()
-    json_string = json.dumps(serialized_dict, indent=2)
+    print(f"\nOriginal:      {cv_original}")
+    print(f"Reconstituted: {cv_reconstituted}")
     
-    print("\n Step 2: Serialized into Clean JSON String Format:")
-    # Print just a snapshot of the output string so it doesn't flood the console
-    print(json_string[:350] + "\n... [Remaining Vector Weights Truncated for Readability] ...\n}")
+    # 3. Evaluate identity vs structural parity
+    print("\n🔍 Running Parity Checks:")
+    print(f" -> Memory Address Match (is) : {cv_original is cv_reconstituted}")
+    print(f" -> Structural Data Match (==): {cv_original == cv_reconstituted}")
     
-    # 3. Simulate a database reload (Convert back from raw JSON data map)
-    loaded_data_map = json.loads(json_string)
-    reconstituted_cv = ContextVector.from_dict(loaded_data_map)
-    
-    print(f"\n Step 3: Reconstituted from Raw JSON Data: {reconstituted_cv}")
-    
-    # 4. Math verification: Do they align perfectly?
-    reconstituted_similarity = original_cv.similarity(reconstituted_cv)
-    print(f" Security Validation Score (Original vs Reconstituted): {reconstituted_similarity:.4f}")
+    # 4. Defensive check against a completely different vector
+    cv_different = ContextVector.from_text("Apples and oranges.", provider, target_model)
+    print(f" -> Distinct Objects Check (==): {cv_original == cv_different}")
