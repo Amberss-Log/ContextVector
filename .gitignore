@@ -1,0 +1,21 @@
+venv/
+.venv/
+env/
+
+.conda/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+context_vector.py
+contextvector.py
+
+# Integrated Development Environment (IDE) settings (like VS Code or PyCharm)
+.vscode/
+.idea/
+
+# Operating System specific files
+.DS_Store
+Thumbs.db
