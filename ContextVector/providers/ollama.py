@@ -1,6 +1,6 @@
 import ollama
 from typing import List
-from interfaces import EmbeddingProvider
+from ..interfaces import EmbeddingProvider
 
 class OllamaProvider(EmbeddingProvider):
     """

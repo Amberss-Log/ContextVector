@@ -1,13 +1,19 @@
 import numpy as np
-from typing import Any, Union, Dict, Self
-from interfaces import EmbeddingProvider
+from typing import Any, Union, Dict, Optional, Self
+from .interfaces import EmbeddingProvider
 
 class ContextVector:
     """
     ContextVector: The custom multimodal AI data type.
     Binds high-dimensional vector embeddings directly to payloads and modalities.
     """
-    def __init__(self, embedding: Union[list, np.ndarray], payload: Any, modality: str = "text", metadata: Dict = None):
+    def __init__(
+        self, 
+        embedding: Union[list, np.ndarray], 
+        payload: Any, 
+        modality: str = "text", 
+        metadata: Optional[Dict[str, Any]] = None  # Clean, precise type hinting
+    ):
         if not isinstance(embedding, (list, np.ndarray)):
             raise TypeError("Embedding must be a list of numbers or a NumPy ndarray.")
             
@@ -27,7 +33,13 @@ class ContextVector:
         return self._embedding.shape[0]
 
     @classmethod
-    def from_text(cls, text: str, provider: EmbeddingProvider, model_name: str, metadata: Dict = None) -> Self:
+    def from_text(
+        cls, 
+        text: str, 
+        provider: EmbeddingProvider, 
+        model_name: str, 
+        metadata: Optional[Dict[str, Any]] = None  # Aligned factory type hinting
+    ) -> Self:
         """Factory Method: Automates vector extraction using any compliant provider."""
         generated_vector = provider.embed_text(text, model_name=model_name)
         return cls(
@@ -36,7 +48,7 @@ class ContextVector:
             modality="text",
             metadata=metadata
         )
-
+        
     def similarity(self, other: Self) -> float:
         """Computes native Cosine Similarity between two ContextVector instances."""
         if not isinstance(other, ContextVector):
