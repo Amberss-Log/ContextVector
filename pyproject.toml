@@ -64,9 +64,9 @@ all = [
 ]
 
 [project.urls]
-Homepage = "TODO: https://github.com/<username>/ContextVector"
-Repository = "TODO: https://github.com/<username>/ContextVector"
-Issues = "TODO: https://github.com/<username>/ContextVector/issues"
+Homepage = "https://github.com/Amberss-Log/ContextVector"
+Repository = "https://github.com/Amberss-Log/ContextVector"
+Issues = "https://github.com/Amberss-Log/ContextVector/issues"
 
 [tool.setuptools.packages.find]
 include = ["ContextVector*"]
