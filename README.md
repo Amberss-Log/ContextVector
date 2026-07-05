@@ -1,148 +1,69 @@
 # ContextVector
 
-> **A provider-agnostic embedding datatype for Python.**
+> **A first-class semantic data type for AI applications.**
 
-ContextVector is a lightweight Python library that introduces a first-class data type for working with vector embeddings. Instead of treating embeddings as anonymous lists of floating-point numbers, ContextVector binds them together with their original payload, modality, metadata, and native vector operations.
+ContextVector is an open-source Python library that introduces a unified data type for semantic AI systems. Instead of managing embeddings, payloads, metadata, and modality information as separate objects, ContextVector encapsulates them into a single immutable object.
 
-The library is designed around a simple idea:
-
-> **Embeddings should behave like structured objects, not raw arrays.**
-
----
-
-## Features
-
-- Immutable embedding storage
-- Provider-independent embedding generation
-- Built-in cosine similarity
-- Native serialization and deserialization
-- Structural equality comparison
-- Lightweight architecture
-- NumPy-powered vector operations
-- Easily extensible provider interface
+The goal is to make semantic information a first-class citizen in software, enabling developers to build AI applications around a reusable, provider-agnostic semantic primitive rather than disconnected arrays and dictionaries.
 
 ---
 
 ## Why ContextVector?
 
-Most embedding workflows produce something like this:
+Traditional programming languages provide primitive data types such as:
+
+- `int`
+- `float`
+- `str`
+- `list`
+- `dict`
+
+Modern AI applications, however, work with semantic information composed of multiple independent pieces:
+
+- Embedding vectors
+- Original payloads
+- Metadata
+- Modality information
+
+These components are typically managed separately throughout a codebase, making pipelines more complex and error-prone.
+
+ContextVector introduces a single immutable object that groups all semantic information together.
+
+Instead of writing:
 
 ```python
-embedding = [0.12, -0.44, 0.98, ...]
+embedding = provider.embed(text)
+
+payload = text
+
+metadata = {
+    "source": "documentation"
+}
+
+modality = "text"
 ```
 
-After generation, developers must manually manage:
-
-- the original text
-- metadata
-- embedding dimensions
-- similarity calculations
-- serialization
-- storage
-
-ContextVector encapsulates everything into a single object.
+developers can simply create:
 
 ```python
-ContextVector
-├── embedding
-├── payload
-├── modality
-└── metadata
+cv = ContextVector(...)
 ```
 
-This makes embeddings easier to manipulate, serialize, compare, and store.
+The resulting object represents a complete semantic entity that can be compared, serialized, stored, and transported throughout an application.
 
 ---
 
-# Design Principles
+# Features
 
-## Immutable Embeddings
-
-Embedding vectors become read-only immediately after construction.
-
-```python
-self._embedding.flags.writeable = False
-```
-
-This prevents accidental modification during downstream processing.
-
----
-
-## Provider Independence
-
-ContextVector does not know how embeddings are generated.
-
-Instead, every embedding engine implements the same interface.
-
-```
-EmbeddingProvider
-        │
-        ├── OllamaProvider
-        ├── OpenAIProvider
-        ├── HuggingFaceProvider
-        └── CustomProvider
-```
-
-The core library never needs modification when adding new providers.
-
----
-
-## Native Vector Operations
-
-Operations such as cosine similarity belong to the object itself.
-
-```python
-score = vector1.similarity(vector2)
-```
-
-No external machine learning library is required.
-
----
-
-## Architecture
-
-```text
-                Text
-                 │
-                 ▼
-        EmbeddingProvider
-                 │
-        +----------------+
-        | OllamaProvider |
-        +----------------+
-                 │
-                 ▼
-          Vector Embedding
-                 │
-                 ▼
-          ContextVector
-        ┌──────────────┐
-        │ embedding    │
-        │ payload      │
-        │ modality     │
-        │ metadata     │
-        └──────────────┘
-                 │
-                 ▼
-     Similarity • Serialization
-     Equality   • Persistence
-```
-
----
-
-# Project Structure
-
-```text
-ContextVector/
-│
-├── core.py
-├── interfaces.py
-├── main.py
-│
-└── providers/
-    ├── __init__.py
-    └── ollama.py
-```
+- Immutable embedding storage
+- Provider-agnostic architecture
+- Native cosine similarity computation
+- JSON-friendly serialization
+- Structural equality comparison
+- Python sequence protocol support (`len`, indexing, iteration, membership)
+- Multiple embedding providers
+- Lightweight NumPy-based implementation
+- Easily extensible provider interface
 
 ---
 
@@ -151,17 +72,44 @@ ContextVector/
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ContextVector.git
+git clone https://github.com/Amberss-Log/ContextVector.git
+
 cd ContextVector
 ```
 
-Install dependencies
+Install the package
+
+```bash
+pip install -e .
+```
+
+or install the required dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Download an embedding model for Ollama
+---
+
+# Supported Providers
+
+ContextVector is intentionally independent of any specific embedding model.
+
+Currently supported providers include:
+
+- Ollama
+- Hugging Face Sentence Transformers
+- OpenAI Embeddings
+
+Additional providers can be added by implementing the `EmbeddingProvider` interface.
+
+---
+
+## Provider Setup
+
+### Ollama
+
+Install Ollama and download an embedding model.
 
 ```bash
 ollama pull nomic-embed-text
@@ -169,36 +117,66 @@ ollama pull nomic-embed-text
 
 ---
 
+### Hugging Face
+
+Models download automatically on first use.
+
+Example model:
+
+```
+all-MiniLM-L6-v2
+```
+
+---
+
+### OpenAI
+
+Set your API key before creating the provider.
+
+Linux / macOS
+
+```bash
+export OPENAI_API_KEY="your-api-key"
+```
+
+Windows PowerShell
+
+```powershell
+$env:OPENAI_API_KEY="your-api-key"
+```
+
+---
+
 # Quick Start
 
 ```python
-from core import ContextVector
-from providers.ollama import OllamaProvider
+from ContextVector.core import ContextVector
+from ContextVector.providers.ollama import OllamaProvider
 
 provider = OllamaProvider()
 
-model = "nomic-embed-text"
-
 cv1 = ContextVector.from_text(
-    "Artificial intelligence architecture.",
-    provider,
-    model
+    text="Artificial Intelligence",
+    provider=provider,
+    model_name="nomic-embed-text"
 )
 
 cv2 = ContextVector.from_text(
-    "Deep neural networks.",
-    provider,
-    model
+    text="Machine Learning",
+    provider=provider,
+    model_name="nomic-embed-text"
 )
 
-score = cv1.similarity(cv2)
+similarity = cv1.similarity(cv2)
 
-print(score)
+print(similarity)
 ```
 
 ---
 
 # Creating a ContextVector
+
+The recommended way to create objects is through the factory method.
 
 ```python
 cv = ContextVector.from_text(
@@ -206,201 +184,217 @@ cv = ContextVector.from_text(
     provider=provider,
     model_name="nomic-embed-text",
     metadata={
-        "source": "documentation",
-        "language": "english"
+        "source": "example"
     }
 )
 ```
 
 ---
 
-# Accessing Properties
+# Working with ContextVectors
+
+## Dimensions
 
 ```python
-print(cv.embedding)
-
-print(cv.payload)
-
-print(cv.modality)
-
-print(cv.metadata)
-
 print(cv.dimensions)
 ```
 
 ---
 
-# Similarity
-
-Cosine similarity is computed directly by the object.
+## Access the embedding
 
 ```python
-similarity = cv1.similarity(cv2)
+embedding = cv.embedding
 ```
-
-The implementation computes
-
-\[
-Similarity =
-\frac{A \cdot B}
-{\|A\|\|B\|}
-\]
-
-Values range from
-
-```
--1.0 ← opposite direction
-
- 0.0 ← orthogonal
-
-+1.0 ← identical direction
-```
-
-Dimension mismatches automatically raise a `ValueError`.
 
 ---
 
-# Serialization
+## Sequence operations
+
+```python
+len(cv)
+
+cv[0]
+
+for value in cv:
+    print(value)
+
+0.25 in cv
+```
+
+---
+
+## Similarity
+
+Compute cosine similarity directly between two ContextVector objects.
+
+```python
+score = cv1.similarity(cv2)
+```
+
+---
+
+## Serialization
 
 Convert a ContextVector into a JSON-compatible dictionary.
 
 ```python
-payload = cv.to_dict()
-```
-
-Example
-
-```python
-{
-    "embedding": [...],
-    "payload": "...",
-    "modality": "text",
-    "metadata": {...}
-}
+data = cv.to_dict()
 ```
 
 ---
 
-# Deserialization
+## Deserialization
 
-Restore an object from serialized data.
+Reconstruct a ContextVector from stored data.
 
 ```python
-restored = ContextVector.from_dict(payload)
+cv = ContextVector.from_dict(data)
 ```
 
 ---
 
-# Structural Equality
+## Structural Equality
 
-Unlike normal Python objects, ContextVector compares actual content.
+Unlike ordinary Python objects, ContextVector compares stored semantic data instead of object identity.
 
 ```python
 cv1 == cv2
 ```
 
-The comparison checks
+returns `True` only if
 
-- modality
-- payload
-- embedding values
-
-rather than memory addresses.
+- embeddings are identical
+- payloads match
+- modalities match
 
 ---
 
-# Embedding Providers
+# Provider Architecture
 
-Every provider inherits from
+ContextVector separates the semantic data type from the embedding engine.
 
-```python
-EmbeddingProvider
-```
-
-The only required method is
+Every provider simply implements one interface.
 
 ```python
-embed_text(
-    text: str,
-    model_name: str
-) -> List[float]
-```
+class EmbeddingProvider(ABC):
 
-This allows developers to integrate any embedding backend.
-
-Example:
-
-- Ollama
-- OpenAI
-- Hugging Face
-- Cohere
-- SentenceTransformers
-
-without modifying ContextVector.
-
----
-
-# Example Provider
-
-```python
-class MyProvider(EmbeddingProvider):
-
-    def embed_text(
-        self,
-        text,
-        model_name
-    ):
+    @abstractmethod
+    def embed_text(self, text, model_name):
         ...
 ```
 
----
+This allows applications to switch between providers without changing how ContextVector objects are created or used.
 
-# Example Workflow
+For example:
 
 ```python
 provider = OllamaProvider()
+```
 
-cv = ContextVector.from_text(
-    "Context vectors are useful.",
-    provider,
-    "nomic-embed-text"
-)
+can later become
 
-payload = cv.to_dict()
+```python
+provider = HuggingFaceProvider()
+```
 
-restored = ContextVector.from_dict(payload)
+or
 
-assert cv == restored
+```python
+provider = OpenAIProvider()
+```
+
+while the rest of the application remains unchanged.
+
+---
+
+# Project Structure
+
+```
+ContextVector/
+
+├── ContextVector/
+│   ├── core.py
+│   ├── interfaces.py
+│   ├── providers/
+│   │   ├── huggingface.py
+│   │   ├── ollama.py
+│   │   └── openai.py
+│
+├── examples/
+│   ├── basic_similarity.py
+│   └── multi_provider_demo.py
+│
+├── tests/
+│   └── test_core.py
+│
+├── pyproject.toml
+├── requirements.txt
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-# Current Capabilities
+# Design Principles
 
-- Text embeddings
-- Immutable vectors
-- Cosine similarity
-- Serialization
-- Deserialization
-- Structural equality
-- Metadata support
-- Provider abstraction
+## Immutable by Design
+
+Embedding vectors become read-only immediately after construction, preventing accidental modification during downstream processing.
 
 ---
 
-# Future Roadmap
+## Provider Agnostic
 
-- Image embeddings
-- Audio embeddings
-- Video embeddings
-- Hugging Face provider
-- OpenAI provider
-- Cohere provider
+The core data type has no dependency on a particular embedding model.
+
+Embeddings can be generated locally or through cloud APIs while using the exact same ContextVector interface.
+
+---
+
+## Native Operations
+
+Similarity computation belongs to the object itself.
+
+Developers do not need external helper functions simply to compare vectors.
+
+---
+
+## Serializable
+
+ContextVector objects can be safely stored, transmitted over networks, or persisted in databases using native Python dictionaries.
+
+---
+
+# Running the Example
+
+```bash
+python examples/basic_similarity.py
+```
+
+---
+
+# Running Tests
+
+```bash
+python -m unittest discover tests
+```
+
+---
+
+# Roadmap
+
+Future releases are planned to include:
+
+- Image support
+- Audio support
+- Additional similarity metrics
 - Vector arithmetic
-- Distance metrics
-- Batch embedding
-- PyPI package
-- Documentation website
+- Batch embedding generation
+- Native vector database adapters
+- Performance benchmarking
+- Expanded documentation
+- Additional embedding providers
 
 ---
 
@@ -408,10 +402,19 @@ assert cv == restored
 
 Contributions are welcome.
 
-Feel free to submit issues, feature requests, or pull requests.
+Possible ways to contribute include:
+
+- Reporting bugs
+- Improving documentation
+- Adding embedding providers
+- Writing tests
+- Suggesting new APIs
+- Opening pull requests
 
 ---
 
 # License
 
-This project is licensed under the MIT License.
+This project is licensed under the Apache License 2.0.
+
+See the [LICENSE](LICENSE) file for details.
