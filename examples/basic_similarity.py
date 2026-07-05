@@ -1,32 +1,30 @@
-import json
 from ContextVector.core import ContextVector
 from ContextVector.providers.ollama import OllamaProvider
 
 if __name__ == "__main__":
-    print(" Running Structural Equality & Serialization Test...")
+    print(" Running Sequence Protocol & Serialization Test Bench...")
     provider = OllamaProvider()
     target_model = "nomic-embed-text"
     
-    # Generate the base vector instance
     cv_original = ContextVector.from_text(
         text="Structural equality validation ensures object parity.",
         provider=provider,
         model_name=target_model,
-        metadata={"version": 1.0}
+        metadata={"version": 1.1}
     )
     
-    # Convert to dictionary and back to simulate a storage cycle
     payload_map = cv_original.to_dict()
     cv_reconstituted = ContextVector.from_dict(payload_map)
     
-    print(f"\nOriginal:      {cv_original}")
-    print(f"Reconstituted: {cv_reconstituted}")
+    # Showcase the new __repr__ format layout
+    print(f"\nInitialized Object Instance: {cv_original}")
     
-    # Evaluate identity vs structural parity
+    # Showcase container feature set utilities
+    print("\n Testing Sequence Capabilities:")
+    print(f" -> Dimension Length (__len__)   : {len(cv_original)}")
+    print(f" -> Read First Coordinate ([0])  : {cv_original[0]}")
+    print(f" -> Value Search Checking (in)   : {cv_original[0] in cv_original}")
+    
     print("\n Running Parity Checks:")
     print(f" -> Memory Address Match (is) : {cv_original is cv_reconstituted}")
     print(f" -> Structural Data Match (==): {cv_original == cv_reconstituted}")
-    
-    # Defensive check against a completely different vector
-    cv_different = ContextVector.from_text("Apples and oranges.", provider, target_model)
-    print(f" -> Distinct Objects Check (==): {cv_original == cv_different}")

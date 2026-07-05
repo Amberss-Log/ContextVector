@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contextvector"
+version = "0.1.0"
+
+description = "A fundamental immutable datatype for semantic AI applications."
+
+readme = "README.md"
+
+requires-python = ">=3.11"
+
+authors = [
+    { name = "Aarushi Singh", email = "aarushi.iiti@gmail.com" }
+]
+
+license = { text = "Apache-2.0" }
+
+keywords = [
+    "ai",
+    "embeddings",
+    "vector",
+    "semantic-search",
+    "multimodal",
+    "machine-learning",
+    "nlp",
+    "python"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "numpy>=1.24.0"
+]
+
+[project.optional-dependencies]
+
+ollama = [
+    "ollama>=0.2.0"
+]
+
+openai = [
+    "openai>=1.0.0"
+]
+
+sentence-transformers = [
+    "sentence-transformers>=2.2.0"
+]
+
+all = [
+    "ollama>=0.2.0",
+    "openai>=1.0.0",
+    "sentence-transformers>=2.2.0"
+]
+
+[project.urls]
+Homepage = "TODO: https://github.com/<username>/ContextVector"
+Repository = "TODO: https://github.com/<username>/ContextVector"
+Issues = "TODO: https://github.com/<username>/ContextVector/issues"
+
+[tool.setuptools.packages.find]
+include = ["ContextVector*"]

@@ -14,11 +14,25 @@ class ContextVector:
         modality: str = "text", 
         metadata: Optional[Dict[str, Any]] = None  # Clean, precise type hinting
     ):
-        if not isinstance(embedding, (list, np.ndarray)):
-            raise TypeError("Embedding must be a list of numbers or a NumPy ndarray.")
-            
-        self._embedding = np.array(embedding, dtype=np.float32)
-        self._embedding.flags.writeable = False 
+        
+        try:
+            self._embedding = np.asarray(embedding, dtype=np.float32)
+        except (TypeError, ValueError):
+            raise TypeError(
+                "Embedding must be an iterable of numeric values."
+            )
+
+        if self._embedding.ndim != 1:
+            raise ValueError(
+                "Embedding must be a one-dimensional vector."
+            )
+
+        if self._embedding.size == 0:
+            raise ValueError(
+                "Embedding cannot be empty."
+            )
+
+        self._embedding.flags.writeable = False
 
         self.payload = payload
         self.modality = modality.lower()
@@ -109,5 +123,34 @@ class ContextVector:
             np.array_equal(self._embedding, other._embedding)
         )
         
+    def __len__(self) -> int:
+        """
+        Returns the dimensionality of the embedding.
+        """
+        return self.dimensions
+    
+    def __getitem__(self, index: int) -> float:
+        """
+        Returns the embedding coordinate at the given index.
+        """
+        return float(self._embedding[index])
+    
+    def __iter__(self):
+        """
+        Iterate over embedding coordinates.
+        """
+        return iter(self._embedding)
+    
+    def __contains__(self, value: float) -> bool:
+    
+        return value in self._embedding
+
+        
     def __repr__(self) -> str:
-        return f"<ContextVector | Modality: {self.modality.upper()} | Dimensions: {self.dimensions}>"
+        return (
+            f"ContextVector("
+            f"modality='{self.modality}', "
+            f"dimensions={self.dimensions}, "
+            f"payload_type={type(self.payload).__name__}"
+            f")"
+        )
