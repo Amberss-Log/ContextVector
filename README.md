@@ -21,10 +21,9 @@ Modern AI applications, however, work with semantic information composed of mult
 - Modality information
 - Provenance
 
-These components are typically managed separately throughout a codebase, making pipelines more complex and error-prone.
+Different frameworks and vector databases provide their own representations of semantic data. ContextVector aims to provide a lightweight, framework-agnostic representation that can be used consistently across AI pipelines.
 
-ContextVector groups these into one immutable object that can be compared, serialized,
-validated, and transported throughout an application.
+It groups semantic information into a single immutable object that can be compared, serialized, validated, and transported throughout an application.
 
 Instead of writing:
 
