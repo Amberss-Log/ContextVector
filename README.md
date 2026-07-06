@@ -10,13 +10,8 @@ The goal is to make semantic information a first-class citizen in software, enab
 
 ## Why ContextVector?
 
-Traditional programming languages provide primitive data types such as:
-
-- `int`
-- `float`
-- `str`
-- `list`
-- `dict`
+Traditional programming languages provide primitive data types such as
+`int`, `float`, `str`, `list`, and `dict`.
 
 Modern AI applications, however, work with semantic information composed of multiple independent pieces:
 
@@ -24,10 +19,12 @@ Modern AI applications, however, work with semantic information composed of mult
 - Original payloads
 - Metadata
 - Modality information
+- Provenance
 
 These components are typically managed separately throughout a codebase, making pipelines more complex and error-prone.
 
-ContextVector introduces a single immutable object that groups all semantic information together.
+ContextVector groups these into one immutable object that can be compared, serialized,
+validated, and transported throughout an application.
 
 Instead of writing:
 
@@ -55,15 +52,16 @@ The resulting object represents a complete semantic entity that can be compared,
 
 # Features
 
-- Immutable embedding storage
-- Provider-agnostic architecture
-- Native cosine similarity computation
-- JSON-friendly serialization
-- Structural equality comparison
-- Python sequence protocol support (`len`, indexing, iteration, membership)
-- Multiple embedding providers
-- Lightweight NumPy-based implementation
-- Easily extensible provider interface
+-   Immutable embedding storage
+-   Provider-agnostic architecture
+-   Provenance-aware vectors
+-   Safe cosine similarity with provenance validation
+-   Integrity-checked serialization/deserialization
+-   Structural equality comparison
+-   Python sequence protocol support (`len`, indexing, iteration, membership)
+-   Multiple embedding providers
+-   Lightweight NumPy implementation
+-   Extensible provider interface
 
 ---
 
@@ -226,7 +224,8 @@ for value in cv:
 
 ## Similarity
 
-Compute cosine similarity directly between two ContextVector objects.
+Compute cosine similarity directly between two ContextVector objects. Similarity requires matching dimensions, provider, and model.
+
 
 ```python
 score = cv1.similarity(cv2)
@@ -267,8 +266,17 @@ returns `True` only if
 - embeddings are identical
 - payloads match
 - modalities match
+- provider names match
+- model names match
 
 ---
+## Safety Guarantees
+
+-   Rejects empty embeddings
+-   Rejects NaN and Inf values
+-   Embeddings are immutable
+-   Validates serialized payloads
+-   Prevents cross-model similarity comparisons
 
 # Provider Architecture
 
@@ -386,30 +394,18 @@ python -m unittest discover tests
 
 Future releases are planned to include:
 
-- Image support
-- Audio support
-- Additional similarity metrics
-- Vector arithmetic
-- Batch embedding generation
-- Native vector database adapters
-- Performance benchmarking
-- Expanded documentation
-- Additional embedding providers
+-   Image and audio support
+-   Vector arithmetic
+-   Additional similarity metrics
+-   Vector database adapters
+-   Performance benchmarks
+-   Expanded documentation
 
 ---
 
 # Contributing
 
-Contributions are welcome.
-
-Possible ways to contribute include:
-
-- Reporting bugs
-- Improving documentation
-- Adding embedding providers
-- Writing tests
-- Suggesting new APIs
-- Opening pull requests
+Contributions are welcome through issues and pull requests.
 
 ---
 
